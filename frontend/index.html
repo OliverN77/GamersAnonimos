@@ -36,5 +36,47 @@
         <div id="gamesContainer" class="games-container"></div>
     </div>
 
+    <div id="gameModal" class="game-modal" aria-hidden="true">
+        <div class="game-modal__backdrop" data-modal-close></div>
+        <div class="game-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="gameModalTitle">
+            <button class="game-modal__close" type="button" aria-label="Cerrar modal" data-modal-close>×</button>
+            <div class="game-modal__media">
+                <img id="gameModalImage" class="game-modal__image" src="" alt="">
+                <div id="gameModalBadges" class="game-modal__badges"></div>
+            </div>
+            <div class="game-modal__content">
+                <div class="game-modal__header">
+                    <h2 id="gameModalTitle" class="game-modal__title"></h2>
+                    <p id="gameModalRelease" class="game-modal__release"></p>
+                </div>
+                <p id="gameModalDescription" class="game-modal__description"></p>
+                <dl class="game-modal__meta">
+                    <div>
+                        <dt>Desarrollador</dt>
+                        <dd id="gameModalDeveloper"></dd>
+                    </div>
+                    <div>
+                        <dt>Publisher</dt>
+                        <dd id="gameModalPublisher"></dd>
+                    </div>
+                    <div>
+                        <dt>Plataforma</dt>
+                        <dd id="gameModalPlatform"></dd>
+                    </div>
+                    <div>
+                        <dt>Género</dt>
+                        <dd id="gameModalGenre"></dd>
+                    </div>
+                </dl>
+                <div class="game-modal__footer">
+                    <button id="saveGameButton" class="game-modal__save" type="button">Guardar en el backend</button>
+                    <a id="gameModalLink" class="game-modal__link" href="#" target="_blank" rel="noopener noreferrer">Ver juego</a>
+                </div>
+                <p id="gameModalStatus" class="game-modal__status"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>
