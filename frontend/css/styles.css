@@ -549,6 +549,195 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* ===== MODAL DE FAVORITOS ===== */
+.favorites-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+}
+
+.favorites-modal.is-open {
+    display: flex;
+}
+
+.favorites-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 4, 10, 0.78);
+    backdrop-filter: blur(8px);
+}
+
+.favorites-modal__dialog {
+    position: relative;
+    width: min(960px, 100%);
+    max-height: min(90vh, 920px);
+    overflow: auto;
+    z-index: 1;
+    border-radius: 26px;
+    border: 1px solid rgba(72, 215, 255, 0.32);
+    background: linear-gradient(180deg, rgba(20, 22, 42, 0.98), rgba(7, 8, 18, 0.98));
+    box-shadow: 0 0 40px rgba(72, 215, 255, 0.24);
+    padding: 24px;
+}
+
+.favorites-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(7, 8, 18, 0.85);
+    color: var(--text-primary);
+    font-size: 1.6rem;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(181, 109, 255, 0.24);
+    transition: all 0.3s ease;
+}
+
+.favorites-modal__close:hover {
+    background: rgba(181, 109, 255, 0.2);
+    box-shadow: 0 0 24px rgba(181, 109, 255, 0.38);
+}
+
+.favorites-modal__title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.1;
+    color: var(--accent-pink);
+    text-shadow: 0 0 16px rgba(72, 215, 255, 0.16);
+    margin-bottom: 24px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+}
+
+.favorites-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.favorites-card {
+    background: linear-gradient(180deg, rgba(26, 28, 53, 0.84), rgba(10, 11, 22, 0.96));
+    border: 1px solid rgba(72, 215, 255, 0.18);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    animation: cardEntry 0.6s ease-out;
+    position: relative;
+}
+
+.favorites-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 35%, rgba(72, 215, 255, 0.08));
+    pointer-events: none;
+}
+
+.favorites-card:hover {
+    transform: translateY(-8px) scale(1.015);
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 24px rgba(181, 109, 255, 0.28), inset 0 0 15px rgba(72, 215, 255, 0.08);
+    background: linear-gradient(135deg, rgba(255, 107, 214, 0.12) 0%, rgba(181, 109, 255, 0.1) 100%);
+}
+
+.favorites-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: all 0.4s ease;
+    display: block;
+}
+
+.favorites-card:hover .favorites-image {
+    filter: brightness(1.2) contrast(1.1);
+    transform: scale(1.05);
+}
+
+.favorites-info {
+    padding: 16px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.favorites-title {
+    font-size: 1.1em;
+    font-weight: 900;
+    color: var(--accent-cyan);
+    line-height: 1.35;
+    letter-spacing: 0.6px;
+    word-wrap: break-word;
+}
+
+.favorites-card:hover .favorites-title {
+    color: var(--accent-pink);
+}
+
+.favorites-meta {
+    display: grid;
+    gap: 6px;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+
+.favorites-genre {
+    color: var(--accent-green);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.favorites-platform {
+    color: var(--accent-cyan);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.favorites-delete {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    border-radius: 8px;
+    color: #ffd0d0;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.favorites-delete:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.65);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+}
+
+.favorites-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--accent-purple);
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
 .game-modal {
     position: fixed;
     inset: 0;

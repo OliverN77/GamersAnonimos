@@ -26,6 +26,7 @@
             <div class="filter-options">
                 <button class="sort-button active" onclick="ordenarPor('az')">A-Z</button>
                 <button class="sort-button" onclick="ordenarPor('za')">Z-A</button>
+                <button class="sort-button favorites-button" onclick="openFavoritesModal()">❤️ Favoritos</button>
             </div>
             <div class="info-text" id="infoText"></div>
         </div>
@@ -34,6 +35,15 @@
         <div id="error" class="error" style="display: none;"></div>
         <div id="noResults" class="no-results" style="display: none;">No se encontraron juegos</div>
         <div id="gamesContainer" class="games-container"></div>
+    </div>
+
+    <div id="favoritesModal" class="favorites-modal" aria-hidden="true">
+        <div class="favorites-modal__backdrop" data-favorites-modal-close></div>
+        <div class="favorites-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="favoritesModalTitle">
+            <button class="favorites-modal__close" type="button" aria-label="Cerrar modal" data-favorites-modal-close>×</button>
+            <h2 id="favoritesModalTitle" class="favorites-modal__title">Mis Juegos Favoritos</h2>
+            <div id="favoritesContainer" class="favorites-container"></div>
+        </div>
     </div>
 
     <div id="gameModal" class="game-modal" aria-hidden="true">

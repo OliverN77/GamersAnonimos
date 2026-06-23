@@ -1,4 +1,4 @@
-const API_BASE = 'https://www.freetogame.com/api';
+const API_BASE = 'http://localhost:3000/api';
 
 const state = {
 	allGames: [],
@@ -6,7 +6,8 @@ const state = {
 	query: '',
 	sortMode: 'az',
 	selectedGame: null,
-	visibleCount: 20
+	visibleCount: 20,
+	favorites: []
 };
 
 const elements = {};
@@ -211,12 +212,122 @@ function closeGameModal() {
 	document.body.classList.remove('modal-open');
 }
 
-function guardarEnBackend() {
+async function loadFavorites() {
+	try {
+		const response = await fetch(`${API_BASE}/favorites`);
+		if (!response.ok) {
+			throw new Error(`No se pudo cargar los favoritos (${response.status})`);
+		}
+		const data = await response.json();
+		state.favorites = Array.isArray(data) ? data.map(normalizeGame) : [];
+	} catch (error) {
+		console.error('Error cargando favoritos:', error);
+		state.favorites = [];
+	}
+}
+
+function renderFavorites() {
+	if (!state.favorites.length) {
+		elements.favoritesContainer.innerHTML = '<div class="favorites-empty">No tienes juegos favoritos aún</div>';
+		return;
+	}
+
+	const markup = state.favorites.map((game) => {
+		const imageMarkup = game.thumbnail
+			? `<img class="favorites-image" src="${escapeHtml(game.thumbnail)}" alt="${escapeHtml(game.title)}">`
+			: `<div class="favorites-image" style="background: linear-gradient(135deg, rgba(72, 215, 255, 0.08), rgba(181, 109, 255, 0.1));" aria-hidden="true"></div>`;
+
+		return `
+			<article class="favorites-card" data-favorite-id="${escapeHtml(game.id)}">
+				${imageMarkup}
+				<div class="favorites-info">
+					<h3 class="favorites-title">${escapeHtml(game.title)}</h3>
+					<div class="favorites-meta">
+						<div class="favorites-genre">${escapeHtml(game.genre)}</div>
+						<div class="favorites-platform">${escapeHtml(game.platform)}</div>
+					</div>
+					<button class="favorites-delete" onclick="deleteFavorite('${escapeHtml(game.id)}')">Eliminar</button>
+				</div>
+			</article>
+		`;
+	}).join('');
+
+	elements.favoritesContainer.innerHTML = markup;
+}
+
+function openFavoritesModal() {
+	loadFavorites().then(() => {
+		renderFavorites();
+		elements.favoritesModal.classList.add('is-open');
+		elements.favoritesModal.setAttribute('aria-hidden', 'false');
+		document.body.classList.add('modal-open');
+		window.setTimeout(() => elements.favoritesModalClose.focus(), 0);
+	});
+}
+
+function closeFavoritesModal() {
+	elements.favoritesModal.classList.remove('is-open');
+	elements.favoritesModal.setAttribute('aria-hidden', 'true');
+	document.body.classList.remove('modal-open');
+}
+
+async function deleteFavorite(gameId) {
+	try {
+		const response = await fetch(`${API_BASE}/favorites/${gameId}`, {
+			method: 'DELETE'
+		});
+
+		if (!response.ok) {
+			throw new Error(`No se pudo eliminar el favorito (${response.status})`);
+		}
+
+		state.favorites = state.favorites.filter(game => String(game.id) !== String(gameId));
+		renderFavorites();
+	} catch (error) {
+		alert('Error al eliminar el favorito: ' + error.message);
+	}
+}
+
+async function guardarEnBackend() {
+
 	if (!state.selectedGame) {
 		return;
 	}
 
-	elements.gameModalStatus.textContent = 'Botón preparado: falta conectar la carpeta backend.';
+	try {
+
+		const response =
+			await fetch(
+				'http://localhost:3000/api/favorites',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type':
+							'application/json'
+					},
+					body: JSON.stringify(
+						state.selectedGame
+					)
+				}
+			);
+
+		const data =
+			await response.json();
+
+		if (!response.ok) {
+			throw new Error(
+				data.message
+			);
+		}
+
+		elements.gameModalStatus.textContent =
+			'Juego guardado correctamente';
+
+	} catch (error) {
+
+		elements.gameModalStatus.textContent =
+			error.message;
+	}
 }
 
 function applyFilters() {
@@ -336,9 +447,23 @@ function setupEvents() {
 
 	elements.gameModalClose.addEventListener('click', closeGameModal);
 	elements.saveGameButton.addEventListener('click', guardarEnBackend);
+	
+	elements.favoritesModal.addEventListener('click', (event) => {
+		if (event.target.matches('[data-favorites-modal-close]')) {
+			closeFavoritesModal();
+		}
+	});
+
+	elements.favoritesModalClose.addEventListener('click', closeFavoritesModal);
+
 	document.addEventListener('keydown', (event) => {
-		if (event.key === 'Escape' && elements.gameModal.classList.contains('is-open')) {
-			closeGameModal();
+		if (event.key === 'Escape') {
+			if (elements.gameModal.classList.contains('is-open')) {
+				closeGameModal();
+			}
+			if (elements.favoritesModal.classList.contains('is-open')) {
+				closeFavoritesModal();
+			}
 		}
 	});
 }
@@ -364,6 +489,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	elements.gameModalStatus = document.getElementById('gameModalStatus');
 	elements.gameModalClose = document.querySelector('.game-modal__close');
 	elements.saveGameButton = document.getElementById('saveGameButton');
+	elements.favoritesModal = document.getElementById('favoritesModal');
+	elements.favoritesContainer = document.getElementById('favoritesContainer');
+	elements.favoritesModalClose = document.querySelector('.favorites-modal__close');
 	ensureLoadMoreSentinel();
 	loadMoreObserver = new IntersectionObserver((entries) => {
 		if (entries.some((entry) => entry.isIntersecting)) {
@@ -382,4 +510,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.buscarJuegos = buscarJuegos;
 window.ordenarPor = ordenarPor;
+window.openFavoritesModal = openFavoritesModal;
+window.deleteFavorite = deleteFavorite;
 
