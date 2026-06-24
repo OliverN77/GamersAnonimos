@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 
 const FavoriteGame =
-    require('../models/FavoriteGame');
+    require('../models/favoriteGame');
 
 const FILE_PATH = path.join(
     __dirname,
