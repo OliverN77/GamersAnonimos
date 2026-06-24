@@ -66,7 +66,16 @@ async function saveFavorite(game) {
     return newFavorite;
 }
 
+function deleteGameFromFavorites(gameId) {
+    return getFavorites()
+        .then(favorites => {
+            const updatedFavorites = favorites.filter(favorite => String(favorite.id) !== String(gameId));
+            return fs.writeFile(FILE_PATH, JSON.stringify(updatedFavorites, null, 2));
+        });
+}
+
 module.exports = {
     getFavorites,
-    saveFavorite
+    saveFavorite,
+    deleteGameFromFavorites
 };

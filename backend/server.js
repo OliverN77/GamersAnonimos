@@ -113,6 +113,35 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    //Eliminar favorito
+    if (req.method === 'DELETE' && req.url.startsWith('/api/favorites/')) {
+
+        const gameId = req.url.split('/').pop();
+
+        try {
+
+            await favoriteService.deleteGameFromFavorites(gameId);
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            });
+            return res.end(
+                JSON.stringify({
+                    message: 'Juego eliminado de favoritos'
+                })
+            );
+        } catch (error) {
+
+            res.writeHead(500, {
+                'Content-Type': 'application/json'
+            });
+            return res.end(
+                JSON.stringify({
+                    message: error.message
+                })
+            );
+        }
+    }
+
     // 404 AL FINAL
     res.writeHead(404, {
         'Content-Type': 'application/json'

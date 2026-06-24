@@ -245,7 +245,7 @@ async function guardarEnBackend() {
 
 
 // =======================================================
-// FAVORITOS (solo lectura: sin opción de eliminar)
+// FAVORITOS
 // =======================================================
 
 async function loadFavorites() {
@@ -274,6 +274,9 @@ function buildFavoriteCardHTML(game) {
 				<div class="favorites-meta">
 					<div class="favorites-genre">${escapeHtml(game.genre)}</div>
 					<div class="favorites-platform">${escapeHtml(game.platform)}</div>
+					<button class="favorites-delete" data-favorite-id="${escapeHtml(game.id)}" aria-label="Eliminar ${escapeHtml(game.title)} de favoritos">Eliminar</button>
+				</div>
+				<div class="favorites-link">
 				</div>
 			</div>
 		</article>
@@ -284,6 +287,22 @@ function renderFavorites() {
 	elements.favoritesContainer.innerHTML = state.favorites.length
 		? state.favorites.map(buildFavoriteCardHTML).join('')
 		: '<div class="favorites-empty">No tienes juegos favoritos aún</div>';
+}
+
+async function deleteFavorite(gameId) {
+	try {
+		const response = await fetch(`${API_BASE}/favorites/${gameId}`, {
+			method: 'DELETE'
+		});
+		const data = await response.json();
+
+		if (!response.ok) throw new Error(data.message || 'No se pudo eliminar el favorito');
+
+		state.favorites = state.favorites.filter((favorite) => String(favorite.id) !== String(gameId));
+		renderFavorites();
+	} catch (error) {
+		console.error('Error eliminando favorito:', error);
+	}
 }
 
 function openFavoritesModal() {
@@ -402,6 +421,13 @@ function setupEvents() {
 
 	elements.favoritesModal.addEventListener('click', (event) => {
 		if (event.target.matches('[data-favorites-modal-close]')) closeFavoritesModal();
+	});
+	elements.favoritesContainer.addEventListener('click', (event) => {
+		const deleteButton = event.target.closest('.favorites-delete');
+		if (!deleteButton) return;
+
+		const favoriteId = deleteButton.dataset.favoriteId;
+		if (favoriteId) deleteFavorite(favoriteId);
 	});
 	elements.favoritesModalClose.addEventListener('click', closeFavoritesModal);
 
