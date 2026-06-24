@@ -39,6 +39,9 @@ function escapeHtml(value) {
 // Convierte un juego "crudo" de la API a un formato consistente, con valores
 // por defecto si faltan datos.
 function normalizeGame(game) {
+	const releaseDate = game.releaseDate || game.release_date || 'Fecha no disponible';
+	const gameUrl = game.gameUrl || game.game_url || '';
+
 	return {
 		id: game.id,
 		title: game.title || game.name || 'Sin título',
@@ -48,8 +51,8 @@ function normalizeGame(game) {
 		description: game.short_description || game.description || 'Sin descripción disponible.',
 		developer: game.developer || 'Desarrollador no disponible',
 		publisher: game.publisher || 'Publisher no disponible',
-		releaseDate: game.release_date || 'Fecha no disponible',
-		gameUrl: game.game_url || '',
+		releaseDate,
+		gameUrl,
 		searchTitle: normalizeText(game.title || game.name || '')
 	};
 }
