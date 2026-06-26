@@ -9,6 +9,7 @@ const FILE_PATH = path.join(
     '../data/favorites.json'
 );
 
+// Lee los favoritos desde disco y crea el archivo si todavía no existe.
 async function getFavorites() {
 
     try {
@@ -32,10 +33,10 @@ async function getFavorites() {
     }
 }
 
+// Guarda un juego nuevo en favoritos evitando duplicados por id.
 async function saveFavorite(game) {
 
-    const favorites =
-        await getFavorites();
+    const favorites = await getFavorites();
 
     const exists =
         favorites.find(
@@ -66,12 +67,18 @@ async function saveFavorite(game) {
     return newFavorite;
 }
 
-function deleteGameFromFavorites(gameId) {
-    return getFavorites()
-        .then(favorites => {
-            const updatedFavorites = favorites.filter(favorite => String(favorite.id) !== String(gameId));
-            return fs.writeFile(FILE_PATH, JSON.stringify(updatedFavorites, null, 2));
-        });
+// Elimina un favorito por id y persiste la lista actualizada en el archivo JSON.
+async function deleteGameFromFavorites(gameId) {
+    const favorites = await getFavorites();
+
+    const updatedFavorites = favorites.filter(
+        favorite => String(favorite.id) !== String(gameId)
+    );
+
+    await fs.writeFile(
+        FILE_PATH,
+        JSON.stringify(updatedFavorites, null, 2)
+    );
 }
 
 module.exports = {

@@ -1,5 +1,6 @@
 const Game = require('../models/Game');
 
+// Consulta la API pública de juegos y convierte cada respuesta en una instancia del modelo Game.
 async function getAllGames() {
 
     const response = await fetch('https://www.freetogame.com/api/games');

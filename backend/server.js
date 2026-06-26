@@ -3,18 +3,22 @@ const http = require('http');
 const gameService = require('./services/gameService');
 const favoriteService = require('./services/favoriteService');
 
+// Servidor HTTP mínimo que expone la API del backend
 const server = http.createServer(async (req, res) => {
 
+    // Encabezados comunes para permitir consumo desde el frontend.
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+    // Respuesta rápida para peticiones CORS preflight.
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
         return res.end();
     }
 
     // GAMES
+    // Devuelve la lista de juegos consultando la API externa.
     if (req.method === 'GET' && req.url === '/api/games') {
 
         try {
@@ -40,12 +44,12 @@ const server = http.createServer(async (req, res) => {
     }
 
     // FAVORITOS
+    // Devuelve los juegos guardados en el archivo local.
     if (req.method === 'GET' && req.url === '/api/favorites') {
 
         try {
 
-            const favorites =
-                await favoriteService.getFavorites();
+            const favorites = await favoriteService.getFavorites();
 
             res.writeHead(200, {
                 'Content-Type': 'application/json'
@@ -70,6 +74,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // GUARDAR FAVORITO
+    // Recibe un juego desde el frontend y lo persiste como favorito.
     if (req.method === 'POST' && req.url === '/api/favorites') {
 
         let body = '';
@@ -82,11 +87,13 @@ const server = http.createServer(async (req, res) => {
 
             try {
 
-                const game =
-                    JSON.parse(body);
+                const game = JSON.parse(body);
 
-                const favorite =
-                    await favoriteService.saveFavorite(game);
+                const favorite = await favoriteService.saveFavorite(game);
+
+                console.log(
+                    `Favorito guardado: ${favorite.title} (ID: ${favorite.id})`
+                );
 
                 res.writeHead(201, {
                     'Content-Type': 'application/json'
@@ -113,7 +120,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    //Eliminar favorito
+    // Borra un favorito por id usando el último segmento de la URL.
     if (req.method === 'DELETE' && req.url.startsWith('/api/favorites/')) {
 
         const gameId = req.url.split('/').pop();
@@ -121,6 +128,11 @@ const server = http.createServer(async (req, res) => {
         try {
 
             await favoriteService.deleteGameFromFavorites(gameId);
+
+            console.log(
+                `Favorito eliminado: ID ${gameId}`
+            );
+
             res.writeHead(200, {
                 'Content-Type': 'application/json'
             });
@@ -143,6 +155,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // 404 AL FINAL
+    // Si no coincide ninguna ruta, devolvemos un error uniforme.
     res.writeHead(404, {
         'Content-Type': 'application/json'
     });
@@ -155,6 +168,7 @@ const server = http.createServer(async (req, res) => {
 
 });
 
+// El backend escucha en el puerto 3000.
 server.listen(3000, () => {
     console.log(
         'Servidor ejecutándose en puerto 3000'
